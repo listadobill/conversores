@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor IPTV</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            white-space: pre-wrap; /* Permite quebras de linha */
+        }
+    </style>
+</head>
+<body>
+    <h1>Conversor IPTV</h1>
+    <textarea id="iptvList" placeholder="Cole sua lista de URLs IPTV aqui..."></textarea>
+    <button onclick="convertUrls()">Converter</button>
+    <button onclick="downloadFile()">Baixar .m3u</button>
+    <h2>Resultado:</h2>
+    <pre id="result"></pre>
+
+    <script>
+        let convertedContent = '';
+
+        function convertUrls() {
+            const input = document.getElementById('iptvList').value;
+            const lines = input.split('\n');
+            const result = lines.map(line => {
+                // Verifica se a linha é uma URL e contém "3050"
+                if (line.includes('http://') && line.includes(':3050/')) {
+                    // Substitui "3050/" por "3050/live/"
+                    line = line.replace(/:3050\//, ':3050/live/');
+                    // Adiciona ".m3u8" no final, caso não tenha extensão
+                    if (!line.endsWith('.m3u8')) {
+                        if (line.endsWith('.ts')) {
+                            line = line.replace(/\.ts$/, '.m3u8');
+                        } else {
+                            line += '.m3u8';
+                        }
+                    }
+                }
+                return line; // Retorna a linha modificada ou original
+            });
+            convertedContent = result.join('\n');
+            document.getElementById('result').textContent = convertedContent;
+        }
+
+        function downloadFile() {
+            const blob = new Blob([convertedContent], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'resultado.m3u';
+            link.click();
+        }
+    </script>
+</body>
+</html>
